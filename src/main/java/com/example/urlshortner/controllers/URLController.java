@@ -2,6 +2,7 @@ package com.example.urlshortner.controllers;
 
 import com.example.urlshortner.dtos.ShortURLRequestDTO;
 import com.example.urlshortner.dtos.ShortURLResponseDTO;
+import com.example.urlshortner.exceptions.URLNotFoundException;
 import com.example.urlshortner.services.URLService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -28,9 +29,10 @@ public class URLController {
     }
 
     @GetMapping("/r/{shortURL}")
-    public ResponseEntity<Void> redirect(@PathVariable String shortURL){
+    public ResponseEntity<Void> redirect(@PathVariable String shortURL) throws URLNotFoundException {
+
         String originalURL = urlService.decode(shortURL);
-        if(!originalURL.equals("")){
+
             if(!originalURL.startsWith("http://") && !originalURL.startsWith("https://")){
 
                 originalURL = "https://" + originalURL;
@@ -40,10 +42,6 @@ public class URLController {
                     .status(302)
                     .location(URI.create(originalURL))
                     .build();
-        }
-        return ResponseEntity
-                .badRequest()
-                .build();
 
     }
 }

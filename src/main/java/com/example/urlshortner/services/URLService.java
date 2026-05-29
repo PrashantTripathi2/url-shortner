@@ -1,6 +1,7 @@
 package com.example.urlshortner.services;
 
 import com.example.urlshortner.entities.URLEntity;
+import com.example.urlshortner.exceptions.URLNotFoundException;
 import com.example.urlshortner.repositories.URLTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,8 +41,9 @@ public class URLService {
         return shortURL;
     }
 
-    public String decode(String shortURL){
+    public String decode(String shortURL) throws URLNotFoundException{
         long id = 0;
+        String longurl;
         logger.info("Start decoidng the short url: {}",shortURL);
         for(char c : shortURL.toCharArray()){
             int index = CHARACTERS.indexOf(c);
@@ -50,11 +52,18 @@ public class URLService {
             }
             id = id*62+index;
         }
+
         logger.info("DB id genreated from short url id: {}",id);
         Optional<URLEntity> urlEntity = urlTable.findById(id);
-        String longurl = urlEntity.isPresent()?urlEntity.get().getUrl()
-                :"";
+
+         if(!urlEntity.isPresent()){
+             logger.error("URL Not Found for short url: {}",shortURL);
+             throw new URLNotFoundException(shortURL);
+         }
+
+        longurl = urlEntity.get().getUrl();
         logger.info("Long url found in DB url: {}",longurl);
+
         return  longurl;
     }
 }
