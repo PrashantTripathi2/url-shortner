@@ -15,8 +15,12 @@ import java.util.Optional;
 public class URLService {
 
     public static final Logger logger = LoggerFactory.getLogger(URLService.class);
-    @Autowired
+
     URLTable urlTable;
+
+    public URLService(URLTable urlTable){
+        this.urlTable = urlTable;
+    }
 
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     public String encode(String url){
